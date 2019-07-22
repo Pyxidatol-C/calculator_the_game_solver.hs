@@ -6,7 +6,11 @@ A haskell solver for [*Calculator The Game*](https://apps.apple.com/us/app/calcu
 
 ### LEVEL: 42
 
-![initial value: 0; goal: -13; moves: 4; buttons: +3, -7, +/-](./lvl_42.png)
+<img
+    alt="initial value: 0; goal: -13; moves: 4; buttons: +3, -7, +/-]"
+    src="gallery_assets/lvl_42.PNG"
+    width="256"
+/>
 
 ```hs
 main :: IO ()
@@ -28,7 +32,11 @@ $ ./calc_the_g
 
 ### LEVEL: 155
 
-![initiial value: 9; goal: 3001, moves: 9; buttons: 39 => 93, /3, Store, 31 => 00](./lvl_155.png)
+<img 
+    alt="initiial value: 9; goal: 3001, moves: 9; buttons: 39 => 93, /3, Store, 31 => 00"
+    src="gallery_assets/lvl_155.PNG"
+    width="256"
+/>
 
 ```hs
 main :: IO ()
@@ -53,7 +61,11 @@ $ ./calc_the_g
 
 ### LEVEL: 188
 
-![initial value: 25; goal: 822; moves: 6; portal piping the 1st digit counting from the left to the 3rd digit; buttons: Mirror, 5, Store, <<](./lvl_188.png)
+<img
+    alt="initial value: 25; goal: 822; moves: 6; portal piping the 1st digit counting from the left to the 3rd digit; buttons: Mirror, 5, Store, <<"
+    src="gallery_assets/lvl_188.PNG"
+    width="256"
+/>
 
 ```hs
 main :: IO ()
@@ -75,7 +87,11 @@ $ ./calc_the_g
 
 ### LEVEL: 194
 
-![initial value: 333; goal: 123; moves: 4; buttons: 1, 3, /2, [+]1](./lvl_194.png)
+<img
+    alt="initial value: 333; goal: 123; moves: 4; buttons: 1, 3, /2, [+]1]"
+    src="gallery_assets/lvl_194.PNG"
+    width="256"
+/>
 
 ```hs
 main :: IO ()
