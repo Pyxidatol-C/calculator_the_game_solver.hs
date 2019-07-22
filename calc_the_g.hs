@@ -7,10 +7,10 @@ data Op = Add Int | Sub Int | Mul Int | Div Int | Insert Int | Neg |
 
 instance Show Op where
     show op = case op of
-        Add    n                     -> "+ " ++ show n
-        Sub    n                     -> "- " ++ show n
-        Mul    n                     -> "* " ++ show n
-        Div    n                     -> "/ " ++ show n
+        Add    n                     -> "+" ++ show n
+        Sub    n                     -> "-" ++ show n
+        Mul    n                     -> "*" ++ show n
+        Div    n                     -> "/" ++ show n
         Insert n                     -> show n
         Sum                          -> "SUM"
         Reverse                      -> "Reverse"
@@ -22,7 +22,7 @@ instance Show Op where
         Mirror                       -> "Mirror"
         StoreNew                     -> "Store"
         StoreInsert                  -> "Store"
-        IncrementFuckingBloodyMeta n -> "[+] " ++ show n
+        IncrementFuckingBloodyMeta n -> "[+]" ++ show n
 
 toDigits :: Int -> [Int]
 toDigits 0 = [0]
@@ -137,15 +137,11 @@ solution' v0 _ nbSteps ops f =
 
 main :: IO ()
 main =
-    let
-        v0      = 9
-        goal    = 3001
-        nbMoves = 9
-        ops =
-            [Replace "39" "93", Div 3, StoreNew, StoreInsert, Replace "31" "00"]
-        f   = id
+    let v0      = 25
+        goal    = 822
+        nbMoves = 6
+        ops     = [Mirror, Insert 5, StoreNew, StoreInsert, Delete]
+        f       = portal 3 1
         -- Change the parameters above according to the lvl
-        res = solution v0 goal nbMoves ops f
-    in
-        print res
-
+        res     = solution v0 goal nbMoves ops f
+    in  print res
