@@ -3,6 +3,7 @@ type State = ((Int, Maybe Int), [Op])
 data Op = Add Int | Sub Int | Mul Int | Div Int | Insert Int | Neg |
     Sum | Reverse | Replace String String | Delete | Shift | Inv10 |
     Mirror | StoreNew | StoreInsert | IncrementFuckingBloodyMeta Int
+    deriving (Eq)
 
 instance Show Op where
     show op = case op of
@@ -95,12 +96,15 @@ execute StoreInsert ((n, mStore), ops) = case mStore of
 execute (IncrementFuckingBloodyMeta m) ((n, mStore), ops) =
     [((n, mStore), fmap (increment m) ops)]
 
-eval :: (Int -> Int) -> [(State, [Op])] -> [(State, [Op])]
+eval :: (Int -> Int) -> [((State, [Op]), [State])] -> [((State, [Op]), [State])]
 eval f statesWithHistory = do
-    ((st, ops), history) <- statesWithHistory
-    op                   <- ops
-    ((n, store), ops')   <- execute op (st, ops)
-    return (((f n, store), ops'), op : history)
+    (((st, ops), history), explored) <- statesWithHistory
+    op                               <- ops
+    ((n, store), ops')               <- execute op (st, ops)
+    let st' = ((f n, store), ops')
+    if st' `elem` explored
+        then []
+        else return ((st', op : history), st' : explored)
 
 portal :: Int -> Int -> Int -> Int -- count i, j from right
 portal i j n | i < j          = error "Must pipe to lower digit"
@@ -128,8 +132,8 @@ solution v0 goal nbSteps ops f = reverse moves
 
 solution' :: Int -> Int -> Int -> [Op] -> (Int -> Int) -> [[(State, [Op])]]
 solution' v0 _ nbSteps ops f =
-    let steps = iterate (eval f) [(((v0, Nothing), ops), [])]
-    in  take (nbSteps + 1) steps
+    let steps = iterate (eval f) [((((v0, Nothing), ops), []), [])]
+    in  fmap fst <$> take (nbSteps + 1) steps
 
 main :: IO ()
 main =
