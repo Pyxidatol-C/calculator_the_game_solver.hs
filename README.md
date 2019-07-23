@@ -56,7 +56,7 @@ main =
 
 ```console
 $ ./calc_the_g
-[Store,/3,Store,39 => 93,Store,Store,39 => 93,/3,31 => 00]
+[Store (new),/3,Store (Ins),39 => 93,Store (new),Store (Ins),39 => 93,/3,31 => 00]
 ```
 
 ### LEVEL: 188
@@ -73,7 +73,7 @@ main =
     let v0      = 25
         goal    = 822
         nbMoves = 6
-        ops     = [Mirror, Insert 5, StoreNew, StoreInsert, Delete]
+        ops     = [Mirror, Ins "5", StoreNew, StoreInsert, Delete]
         f       = portal 3 1
         -- Change the parameters above according to the lvl
         res     = solution v0 goal nbMoves ops f
@@ -82,7 +82,7 @@ main =
 
 ```console
 $ ./calc_the_g
-[5,Mirror,Store,Store]
+[5,Mirror,Store (new),Store (Ins)]
 ```
 
 ### LEVEL: 194
@@ -99,7 +99,7 @@ main =
     let v0      = 333
         goal    = 123
         nbMoves = 4
-        ops     = [Insert 1, Insert 3, Div 2, IncrementFuckingBloodyMeta 1]
+        ops     = [Ins "1", Ins "3", Div 2, IncrementFuckingBloodyMeta 1]
         f       = portal 3 0
         -- Change the parameters above according to the lvl
         res     = solution v0 goal nbMoves ops f
@@ -146,7 +146,7 @@ main =
 | `Sub Int`                        | `Sub 1`                                               | `- 1`                                          | 44 -> 43                                                                                                              |
 | `Mul Int`                        | `Mul 2`                                               | `× 2`                                          | 32 -> 64                                                                                                              |
 | `Div Int`                        | `Div 2`                                               | `/ 2`                                          | 20 -> 10 (only if the division yields an integer)                                                                     |
-| `Insert Int`                     | `Insert 1`                                            | `1`                                            | 7 -> 71                                                                                                               |
+| `Ins String`                     | `Ins "1"`                                             | `1`                                            | 7 -> 71                                                                                                               |
 | `Neg`                            | `Neg`                                                 | `Neg`                                          | 1 -> -1                                                                                                               |
 | `Sum`                            | `Sum`                                                 | `Sum`                                          | 123 -> 6                                                                                                              |
 | `Reverse`                        | `Reverse`                                             | `Reverse`                                      | 69 -> 96                                                                                                              |
@@ -159,8 +159,10 @@ main =
 | `StoreInsert`                    | `StoreInsert`                                         | 99 (after storing this number with `StoreNew`) | 6 -> 699                                                                                                              |
 | `IncrementFuckingBloodyMeta Int` | `IncrementFuckingBloodyMeta 1` (the only one in game) | `[+] 1`                                        | 16 -> 16, but the values of other `Add`, `Sub`, `Mul`, `Div`, `Insert` are incremented by 1; e.g., `Add 1` -> `Add 2` |
 
-### Assumtions
+### Notes
 
-* `[+] 1` only interacts with `Add`, `Sub`, `Mul`, `Div`, `Insert`
+* `[+] 1` only interacts with `Add`, `Sub`, `Mul`, `Div`, and `Ins`.
 
-* `Insert` and `Replace` do not take negative arguments
+* `Insert` and `Replace` only take string representations of non-negative integers as argument(s).
+
+* Calling `Delete` on `0` returns `0`. Due to how the `solution` function avoids sequences of opertaions that yield the same result twice, this operation will not be included in the solution, just like if it threw an error.
