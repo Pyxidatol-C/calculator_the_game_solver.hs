@@ -1,30 +1,39 @@
+module CalculatorTheG
+    ( Op(..)
+    , portal
+    , showSolution
+    )
+where
+
 import           Data.Char                      ( isNumber )
+import           Data.List                      ( intercalate )
 
 type State = ((Int, Maybe Int), [Op])
 
-data Op = Add Int | Sub Int | Mul Int | Div Int | Ins String | Neg |
-    Sum | Reverse | Replace String String | Delete | Shift | Inv10 |
-    Mirror | StoreNew | StoreInsert | IncrementFuckingBloodyMeta Int
+data Op = Add Int | Sub Int | Mul Int | Div Int | Ins String | Inv10 |
+    Sum | Reverse | Replace String String | Delete | ShiftL | ShiftR |
+    Neg | Mirror | StoreNew | StoreInsert | IncrementButtonValues Int
     deriving (Eq)
 
 instance Show Op where
     show op = case op of
-        Add n                        -> "+" ++ show n
-        Sub n                        -> "-" ++ show n
-        Mul n                        -> "*" ++ show n
-        Div n                        -> "/" ++ show n
-        Ins n                        -> n
-        Sum                          -> "SUM"
-        Reverse                      -> "Reverse"
-        Replace a b                  -> a ++ " => " ++ b
-        Delete                       -> "<<"
-        Shift                        -> "Shift >"
-        Inv10                        -> "Inv10"
-        Neg                          -> "+/-"
-        Mirror                       -> "Mirror"
-        StoreNew                     -> "Store (new)"
-        StoreInsert                  -> "Store (Ins)"
-        IncrementFuckingBloodyMeta n -> "[+]" ++ show n
+        Add n                   -> "+" ++ show n
+        Sub n                   -> "-" ++ show n
+        Mul n                   -> "*" ++ show n
+        Div n                   -> "/" ++ show n
+        Ins n                   -> n
+        Sum                     -> "SUM"
+        Reverse                 -> "Reverse"
+        Replace a b             -> a ++ "=>" ++ b
+        Delete                  -> "<<"
+        ShiftL                  -> "Shift<"
+        ShiftR                  -> "Shift>"
+        Inv10                   -> "Inv10"
+        Neg                     -> "+/-"
+        Mirror                  -> "Mirror"
+        StoreNew                -> "Store(new)"
+        StoreInsert             -> "Store(Ins)"
+        IncrementButtonValues n -> "[+]" ++ show n
 
 toDigits :: Int -> [Int]
 toDigits 0 = [0]
@@ -66,10 +75,19 @@ increment n (Add m) = Add (m + n)
 increment n (Sub m) = Sub (m + n)
 increment n (Mul m) = Mul (m + n)
 increment n (Div m) = Div (m + n)
-increment n (Ins m) = Ins
-    (digitsToString . normaliseDigits $ addDigits (stringToDigits m)
-                                                  (toDigits n)
-    )
+increment n (Ins m) = Ins (str $ addDigits ms ns)
+  where
+    ns  = toDigits n
+    ms  = stringToDigits m
+    str = digitsToString . normaliseDigits
+increment n (Replace a b) =
+    let ns  = toDigits n
+        as  = stringToDigits a
+        bs  = stringToDigits b
+        as' = addDigits as ns
+        bs' = addDigits bs ns
+        str = digitsToString . normaliseDigits
+    in  Replace (str as') (str bs')
 increment _ op = op
 
 addDigits :: [Int] -> [Int] -> [Int]
@@ -124,12 +142,17 @@ execute op@Delete st@((n, mStore), ops)
     | n < 0     = executeNeg op st
     | otherwise = [(((toInt . tail . toDigits) n, mStore), ops)]
 
-execute op@Shift st@((n, mStore), ops)
+execute op@ShiftL st@((n, mStore), ops)
     | n < 0
     = executeNeg op st
     | otherwise
-    = let digits = toDigits n
-      in  [((toInt (tail digits ++ [head digits]), mStore), ops)]
+    = let ds = toDigits n in [((toInt $ init ds ++ [last ds], mStore), ops)]
+
+execute op@ShiftR st@((n, mStore), ops)
+    | n < 0
+    = executeNeg op st
+    | otherwise
+    = let ds = toDigits n in [((toInt $ tail ds ++ [head ds], mStore), ops)]
 
 execute op@Inv10 st@((n, mStore), ops)
     | n < 0     = executeNeg op st
@@ -146,14 +169,15 @@ execute op@Mirror st@((n, mStore), ops)
     | otherwise
     = let ds = toDigits n in [((toInt (reverse ds ++ ds), mStore), ops)]
 
-execute StoreNew    ((n, _     ), ops) = [((n, Just n), ops)]
+execute StoreNew ((n, _), ops) | n < 0     = []
+                               | otherwise = [((n, Just n), ops)]
 
 execute StoreInsert ((n, mStore), ops) = case mStore of
     Nothing -> []
     Just m  -> execute (Ins $ show m) ((n, mStore), ops)
 
-execute (IncrementFuckingBloodyMeta m) ((n, mStore), ops) =
-    [((n, mStore), fmap (increment m) ops)]
+execute (IncrementButtonValues m) ((n, mStore), ops) =
+    [((n, fmap (+ m) mStore), fmap (increment m) ops)]
 
 eval :: (Int -> Int) -> [((State, [Op]), [State])] -> [((State, [Op]), [State])]
 eval f statesWithHistory = do
@@ -194,13 +218,6 @@ solution' v0 _ nbSteps ops f =
     let steps = iterate (eval f) [((((v0, Nothing), ops), []), [])]
     in  fmap fst <$> take (nbSteps + 1) steps
 
-main :: IO ()
-main =
-    let v0      = 25
-        goal    = 822
-        nbMoves = 6
-        ops     = [Mirror, Ins "5", StoreNew, StoreInsert, Delete]
-        f       = portal 3 1
-        -- Change the parameters above according to the lvl
-        res     = solution v0 goal nbMoves ops f
-    in  print res
+showSolution :: Int -> Int -> Int -> [Op] -> (Int -> Int) -> String
+showSolution v0 goal nbSteps ops f = prettify $ solution v0 goal nbSteps ops f
+    where prettify ops' = intercalate " -> " $ map show ops'

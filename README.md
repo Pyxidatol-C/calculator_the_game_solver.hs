@@ -13,6 +13,8 @@ A haskell solver for [*Calculator The Game*](https://apps.apple.com/us/app/calcu
 />
 
 ```hs
+import           CalculatorTheG
+
 main :: IO ()
 main =
     let v0      = 0
@@ -20,14 +22,12 @@ main =
         nbMoves = 4
         ops     = [Add 3, Sub 7, Neg]
         f       = id
-        -- Change the parameters above according to the lvl
-        res     = solution v0 goal nbMoves ops f
-    in  print res
+    in  putStrLn $ showSolution v0 goal nbMoves ops f
 ```
 
 ```console
-$ ./calc_the_g
-[+3,+3,+/-,-7]
+$ ghc -O2 solve && ./solve
++3 -> +3 -> +/- -> -7
 ```
 
 ### LEVEL: 155
@@ -39,6 +39,8 @@ $ ./calc_the_g
 />
 
 ```hs
+import           CalculatorTheG
+
 main :: IO ()
 main =
     let
@@ -47,16 +49,14 @@ main =
         nbMoves = 9
         ops =
             [Replace "39" "93", Div 3, StoreNew, StoreInsert, Replace "31" "00"]
-        f   = id
-        -- Change the parameters above according to the lvl
-        res = solution v0 goal nbMoves ops f
+        f = id
     in
-        print res
+        putStrLn $ showSolution v0 goal nbMoves ops f
 ```
 
 ```console
-$ ./calc_the_g
-[Store (new),/3,Store (Ins),39 => 93,Store (new),Store (Ins),39 => 93,/3,31 => 00]
+$ ghc -O2 solve && ./solve
+Store(new) -> /3 -> Store(Ins) -> 39=>93 -> Store(new) -> Store(Ins) -> 39=>93 -> /3 -> 31=>00
 ```
 
 ### LEVEL: 188
@@ -68,6 +68,8 @@ $ ./calc_the_g
 />
 
 ```hs
+import           CalculatorTheG
+
 main :: IO ()
 main =
     let v0      = 25
@@ -75,14 +77,12 @@ main =
         nbMoves = 6
         ops     = [Mirror, Ins "5", StoreNew, StoreInsert, Delete]
         f       = portal 3 1
-        -- Change the parameters above according to the lvl
-        res     = solution v0 goal nbMoves ops f
-    in  print res
+    in  putStrLn $ showSolution v0 goal nbMoves ops f
 ```
 
 ```console
-$ ./calc_the_g
-[5,Mirror,Store (new),Store (Ins)]
+$ ghc -O2 solve && ./solve
+5 -> Mirror -> Store(new) -> Store(Ins)
 ```
 
 ### LEVEL: 194
@@ -94,38 +94,39 @@ $ ./calc_the_g
 />
 
 ```hs
+import           CalculatorTheG
+
 main :: IO ()
 main =
     let v0      = 333
         goal    = 123
         nbMoves = 4
-        ops     = [Ins "1", Ins "3", Div 2, IncrementFuckingBloodyMeta 1]
+        ops     = [Ins "1", Ins "3", Div 2, IncrementButtonValues 1]
         f       = portal 3 0
-        -- Change the parameters above according to the lvl
-        res     = solution v0 goal nbMoves ops f
-    in  print res
+    in  putStrLn $ showSolution v0 goal nbMoves ops f
 ```
 
 ```console
-$ ./calc_the_g
-[3,[+]1,/3,2]
+$ ghc -O2 solve && ./solve
+3 -> [+]1 -> /3 -> 2
 ```
 
 ## API
 
-To compute the (shortest) sequence of operations that beats a level, fill in the `???`s below:
+To compute the (shortest) sequence of operations that beats a level, fill in the `???`s below in `solve.hs`:
 
 ```hs
+import           CalculatorTheG
+
 main :: IO ()
 main =
-    let v0      = ??? :: Int
-        goal    = ??? :: Int
-        nbMoves = ??? :: Int
-        ops     = ??? :: [Op]
-        f       = ??? :: Int -> Int
-        -- Change the parameters above according to the lvl
-        res     = solution v0 goal nbMoves ops f
-    in  print res
+    let v0      = ???
+        goal    = ???
+        nbMoves = ???
+        ops     = ???
+        f       = ???
+    in  putStrLn $ showSolution v0 goal nbMoves ops f
+
 ```
 
 ### Parameters
@@ -140,28 +141,29 @@ main =
 
 ### `Op`erations
 
-| Constructor                      | Example                                               | Corresponding button label                     | Effect of said button                                                                                                 |
-| -------------------------------- | ----------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `Add Int`                        | `Add 1`                                               | `+ 1`                                          | 6 -> 7                                                                                                                |
-| `Sub Int`                        | `Sub 1`                                               | `- 1`                                          | 44 -> 43                                                                                                              |
-| `Mul Int`                        | `Mul 2`                                               | `× 2`                                          | 32 -> 64                                                                                                              |
-| `Div Int`                        | `Div 2`                                               | `/ 2`                                          | 20 -> 10 (only if the division yields an integer)                                                                     |
-| `Ins String`                     | `Ins "1"`                                             | `1`                                            | 7 -> 71                                                                                                               |
-| `Neg`                            | `Neg`                                                 | `Neg`                                          | 1 -> -1                                                                                                               |
-| `Sum`                            | `Sum`                                                 | `Sum`                                          | 123 -> 6                                                                                                              |
-| `Reverse`                        | `Reverse`                                             | `Reverse`                                      | 69 -> 96                                                                                                              |
-| `Replace String String`          | `Replace "31" "00"`                                   | `31 => 00`                                     | 3311 -> 3001                                                                                                          |
-| `Delete`                         | `Delete`                                              | `<<`                                           | 31 -> 3                                                                                                               |
-| `Shift`                          | `Shift`                                               | `Shift >`                                      | 125 -> 512                                                                                                            |
-| `Inv10`                          | `Inv10`                                               | `Inv10`                                        | 12590 -> 98510                                                                                                        |
-| `Mirror`                         | `Mirror`                                              | `Mirror`                                       | 123 -> 123321                                                                                                         |
-| `StoreNew`                       | `StoreNew`                                            | `Store` (long press)                           | 99 -> 99 and the number 99 is stored, allowing you to insert the number 99 by pressing the store button               |
-| `StoreInsert`                    | `StoreInsert`                                         | 99 (after storing this number with `StoreNew`) | 6 -> 699                                                                                                              |
-| `IncrementFuckingBloodyMeta Int` | `IncrementFuckingBloodyMeta 1` (the only one in game) | `[+] 1`                                        | 16 -> 16, but the values of other `Add`, `Sub`, `Mul`, `Div`, `Insert` are incremented by 1; e.g., `Add 1` -> `Add 2` |
+| Constructor                 | Example                                          | Corresponding button label                     | Effect of said button                                                                                                                                   |
+| --------------------------- | ------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Add Int`                   | `Add 1`                                          | `+ 1`                                          | 6 -> 7                                                                                                                                                  |
+| `Sub Int`                   | `Sub 1`                                          | `- 1`                                          | 44 -> 43                                                                                                                                                |
+| `Mul Int`                   | `Mul 2`                                          | `× 2`                                          | 32 -> 64                                                                                                                                                |
+| `Div Int`                   | `Div 2`                                          | `/ 2`                                          | 20 -> 10 (only if the division yields an integer)                                                                                                       |
+| `Ins String`                | `Ins "1"`                                        | `1`                                            | 7 -> 71                                                                                                                                                 |
+| `Neg`                       | `Neg`                                            | `Neg`                                          | 1 -> -1                                                                                                                                                 |
+| `Sum`                       | `Sum`                                            | `Sum`                                          | 123 -> 6                                                                                                                                                |
+| `Reverse`                   | `Reverse`                                        | `Reverse`                                      | 69 -> 96                                                                                                                                                |
+| `Replace String String`     | `Replace "31" "00"`                              | `31 => 00`                                     | 3311 -> 3001                                                                                                                                            |
+| `Delete`                    | `Delete`                                         | `<<`                                           | 31 -> 3                                                                                                                                                 |
+| `ShiftR`                    | `ShiftR`                                         | `Shift >`                                      | 125 -> 512                                                                                                                                              |
+| `ShiftL`                    | `ShiftL`                                         | `Shift <`                                      | 125 -> 251                                                                                                                                              |
+| `Inv10`                     | `Inv10`                                          | `Inv10`                                        | 12590 -> 98510                                                                                                                                          |
+| `Mirror`                    | `Mirror`                                         | `Mirror`                                       | 123 -> 123321                                                                                                                                           |
+| `StoreNew`                  | `StoreNew`                                       | `Store` (long press)                           | 99 -> 99 and the number 99 is stored, allowing you to insert the number 99 by pressing the store button                                                 |
+| `StoreInsert`               | `StoreInsert`                                    | 99 (after storing this number with `StoreNew`) | 6 -> 699                                                                                                                                                |
+| `IncrementButtonValues Int` | `IncrementButtonValues 1` (the only one in game) | `[+] 1`                                        | 16 -> 16, but the values of other `Add`, `Sub`, `Mul`, `Div`, `Ins`, `StoreInsert` and `Replace` buttons are incremented by 1; e.g., `Add 1` -> `Add 2` |
 
 ### Notes
 
-* `[+] 1` only interacts with `Add`, `Sub`, `Mul`, `Div`, and `Ins`.
+* `[+] 1` interacts with `Add`, `Sub`, `Mul`, `Div`, `Ins`, `StoreInsert` and `Replace`.
 
 * `Insert` and `Replace` only take string representations of non-negative integers as argument(s).
 
