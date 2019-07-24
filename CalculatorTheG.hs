@@ -23,8 +23,8 @@ instance Show Op where
         Mul n                   -> "*" ++ show n
         Div n                   -> "/" ++ show n
         Ins n                   -> n
-        Square                  -> "Square"
-        Cube                    -> "Cube"
+        Square                  -> "x^2"
+        Cube                    -> "x^3"
         Sum                     -> "SUM"
         Reverse                 -> "Reverse"
         Replace a b             -> a ++ "=>" ++ b
@@ -152,7 +152,7 @@ execute op@ShiftL st@((n, mStore), ops)
     | n < 0
     = executeNeg op st
     | otherwise
-    = let ds = toDigits n in [((toInt $ init ds ++ [last ds], mStore), ops)]
+    = let ds = toDigits n in [((toInt $ last ds : init ds, mStore), ops)]
 
 execute op@ShiftR st@((n, mStore), ops)
     | n < 0
