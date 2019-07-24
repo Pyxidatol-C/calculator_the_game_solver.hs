@@ -2,6 +2,17 @@
 
 A haskell solver for [*Calculator The Game*](https://apps.apple.com/us/app/calculator-the-game/id1243055750)
 
+- [calculator_the_game_solver.hs](#calculator_the_game_solverhs)
+  - [Gallery](#gallery)
+    - [LEVEL: 42](#level-42)
+    - [LEVEL: 155](#level-155)
+    - [LEVEL: 188](#level-188)
+    - [LEVEL: 194](#level-194)
+  - [API](#api)
+    - [Parameters](#parameters)
+    - [`Op`erations](#operations)
+    - [Notes](#notes)
+
 ## Gallery
 
 ### LEVEL: 42
