@@ -37,7 +37,7 @@ main =
 ```
 
 ```console
-$ ghc -O2 solve && ./solve
+$ ghc solver && ./solver
 +3 -> +3 -> +/- -> -7
 ```
 
@@ -66,7 +66,7 @@ main =
 ```
 
 ```console
-$ ghc -O2 solve && ./solve
+$ ghc solver && ./solver
 Store(new) -> /3 -> Store(Ins) -> 39=>93 -> Store(new) -> Store(Ins) -> 39=>93 -> /3 -> 31=>00
 ```
 
@@ -92,7 +92,7 @@ main =
 ```
 
 ```console
-$ ghc -O2 solve && ./solve
+$ ghc solver && ./solver
 5 -> Mirror -> Store(new) -> Store(Ins)
 ```
 
@@ -118,7 +118,7 @@ main =
 ```
 
 ```console
-$ ghc -O2 solve && ./solve
+$ ghc solver && ./solver
 3 -> [+]1 -> /3 -> 2
 ```
 

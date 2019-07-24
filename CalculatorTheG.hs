@@ -38,7 +38,7 @@ instance Show Op where
 toDigits :: Int -> [Int]
 toDigits 0 = [0]
 toDigits n
-    | n < 0 = error "Internal: attempted to geet digits of a negative number?!"
+    | n < 0 = error "Internal: attempted to get digits of a negative number?!"
     | otherwise = toDigits' n
   where
     toDigits' 0 = []
@@ -63,12 +63,12 @@ replaceDigits ds old new = sub ds [] [] old
         | b == head old = sub bs (res ++ buf) [b] (tail old)
         | otherwise     = sub bs (res ++ buf ++ [b]) [] old
 
-replaceInt :: Int -> [Int] -> [Int] -> Int
+replaceInt :: Int -> String -> String -> Int
 replaceInt n as bs = toInt $ reverse (replaceDigits n' as' bs')
   where
     n'  = reverse $ toDigits n
-    as' = reverse as
-    bs' = reverse bs
+    as' = reverse $ stringToDigits as
+    bs' = reverse $ stringToDigits bs
 
 increment :: Int -> Op -> Op
 increment n (Add m) = Add (m + n)
@@ -119,7 +119,7 @@ execute (Div m) ((n, mStore), ops)
 execute op@(Ins m) st@((n, mStore), ops)
     | not $ all isNumber m = error "You can only `Ins`ert a positive integer!"
     | n < 0 = executeNeg op st
-    | otherwise = [((toInt (stringToDigits m ++ toDigits n), mStore), ops)]
+    | otherwise = [((toInt $ stringToDigits m ++ toDigits n, mStore), ops)]
 
 execute op@Sum st@((n, mStore), ops)
     | n < 0     = executeNeg op st
@@ -127,20 +127,21 @@ execute op@Sum st@((n, mStore), ops)
 
 execute op@Reverse st@((n, mStore), ops)
     | n < 0     = executeNeg op st
-    | otherwise = [(((toInt . reverse . toDigits) n, mStore), ops)]
+    | otherwise = [((toInt . reverse . toDigits $ n, mStore), ops)]
 
 execute op@(Replace a b) st@((n, mStore), ops)
-    | not $ all isNumber a = error "You can only replace a positive integer!"
-    | not $ all isNumber b = error "You can only replace by a positive integer!"
-    | n < 0                = executeNeg op st
-    | otherwise            = [((replaceInt n as bs, mStore), ops)]
-  where
-    as = stringToDigits a
-    bs = stringToDigits b
+    | not $ all isNumber a
+    = error "You can only replace a positive integer!"
+    | not $ all isNumber b
+    = error "You can only replace by a positive integer!"
+    | n < 0
+    = executeNeg op st
+    | otherwise
+    = [((replaceInt n a b, mStore), ops)]
 
 execute op@Delete st@((n, mStore), ops)
     | n < 0     = executeNeg op st
-    | otherwise = [(((toInt . tail . toDigits) n, mStore), ops)]
+    | otherwise = [((toInt . tail . toDigits $ n, mStore), ops)]
 
 execute op@ShiftL st@((n, mStore), ops)
     | n < 0
@@ -156,7 +157,7 @@ execute op@ShiftR st@((n, mStore), ops)
 
 execute op@Inv10 st@((n, mStore), ops)
     | n < 0     = executeNeg op st
-    | otherwise = [((toInt (map f digits), mStore), ops)]
+    | otherwise = [((toInt $ map f digits, mStore), ops)]
   where
     digits = toDigits n
     f x = (10 - x) `mod` 10
@@ -167,7 +168,7 @@ execute op@Mirror st@((n, mStore), ops)
     | n < 0
     = executeNeg op st
     | otherwise
-    = let ds = toDigits n in [((toInt (reverse ds ++ ds), mStore), ops)]
+    = let ds = toDigits n in [((toInt $ reverse ds ++ ds, mStore), ops)]
 
 execute StoreNew ((n, _), ops) | n < 0     = []
                                | otherwise = [((n, Just n), ops)]
@@ -219,5 +220,5 @@ solution' v0 _ nbSteps ops f =
     in  fmap fst <$> take (nbSteps + 1) steps
 
 showSolution :: Int -> Int -> Int -> [Op] -> (Int -> Int) -> String
-showSolution v0 goal nbSteps ops f = prettify $ solution v0 goal nbSteps ops f
+showSolution = ((.) . (.) . (.) . (.) . (.)) prettify solution
     where prettify ops' = intercalate " -> " $ map show ops'
