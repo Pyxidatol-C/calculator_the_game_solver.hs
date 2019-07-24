@@ -12,7 +12,8 @@ type State = ((Int, Maybe Int), [Op])
 
 data Op = Add Int | Sub Int | Mul Int | Div Int | Ins String | Inv10 |
     Sum | Reverse | Replace String String | Delete | ShiftL | ShiftR |
-    Neg | Mirror | StoreNew | StoreInsert | IncrementButtonValues Int
+    Neg | Mirror | StoreNew | StoreInsert | IncrementButtonValues Int |
+    Square | Cube
     deriving (Eq)
 
 instance Show Op where
@@ -22,6 +23,8 @@ instance Show Op where
         Mul n                   -> "*" ++ show n
         Div n                   -> "/" ++ show n
         Ins n                   -> n
+        Square                  -> "Square"
+        Cube                    -> "Cube"
         Sum                     -> "SUM"
         Reverse                 -> "Reverse"
         Replace a b             -> a ++ "=>" ++ b
@@ -115,6 +118,8 @@ execute (Mul m) ((n, mStore), ops) = [((n * m, mStore), ops)]
 execute (Div m) ((n, mStore), ops)
     | n `mod` m == 0 = [((n `div` m, mStore), ops)]
     | otherwise      = []
+execute Square ((n, mStore), ops) = [((n * n, mStore), ops)]
+execute Cube   ((n, mStore), ops) = [((n * n * n, mStore), ops)]
 
 execute op@(Ins m) st@((n, mStore), ops)
     | not $ all isNumber m = error "You can only `Ins`ert a positive integer!"
@@ -192,7 +197,7 @@ eval f statesWithHistory = do
 
 portal :: Int -> Int -> Int -> Int -- count i, j from right
 portal i j n | i < j          = error "Must pipe to lower digit"
-             | n < 0          = error "WTF n should be positive"
+             | n < 0          = -portal i j (-n)
              | length ds <= i = n
              | otherwise      = portal i j portalSum
   where
