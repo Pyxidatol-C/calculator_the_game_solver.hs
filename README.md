@@ -124,7 +124,7 @@ $ ghc -O2 solve && ./solve
 
 ## API
 
-To compute the (shortest) sequence of operations that beats a level, fill in the `???`s below in `solve.hs`:
+To compute the (shortest) sequence of operations that beats a level, fill in the `???`s below in `solver.hs`:
 
 ```hs
 import           CalculatorTheG
@@ -168,14 +168,14 @@ main =
 | `ShiftL`                    | `ShiftL`                                         | `Shift <`                                      | 125 -> 251                                                                                                                                              |
 | `Inv10`                     | `Inv10`                                          | `Inv10`                                        | 12590 -> 98510                                                                                                                                          |
 | `Mirror`                    | `Mirror`                                         | `Mirror`                                       | 123 -> 123321                                                                                                                                           |
-| `StoreNew`                  | `StoreNew`                                       | `Store` (long press)                           | 99 -> 99 and the number 99 is stored, allowing you to insert the number 99 by pressing the store button                                                 |
+| `StoreNew`                  | `StoreNew`                                       | `Store` (long press)                           | 99 -> 99 and the number 99 is stored, allowing you to insert the number 99 by pressing the store button (only if the number to be stored is positive)   |
 | `StoreInsert`               | `StoreInsert`                                    | 99 (after storing this number with `StoreNew`) | 6 -> 699                                                                                                                                                |
 | `IncrementButtonValues Int` | `IncrementButtonValues 1` (the only one in game) | `[+] 1`                                        | 16 -> 16, but the values of other `Add`, `Sub`, `Mul`, `Div`, `Ins`, `StoreInsert` and `Replace` buttons are incremented by 1; e.g., `Add 1` -> `Add 2` |
 
 ### Notes
 
-* `[+] 1` interacts with `Add`, `Sub`, `Mul`, `Div`, `Ins`, `StoreInsert` and `Replace`.
+- `[+] 1` interacts with `Add`, `Sub`, `Mul`, `Div`, `Ins`, `StoreInsert` and `Replace`.
 
-* `Insert` and `Replace` only take string representations of non-negative integers as argument(s).
+- `Insert` and `Replace` only take string representations of non-negative integers as argument(s).
 
-* Calling `Delete` on `0` returns `0`. Due to how the `solution` function avoids sequences of opertaions that yield the same result twice, this operation will not be included in the solution, just like if it threw an error.
+- Calling `Delete` on `0` returns `0`. Due to how the `solution` function avoids sequences of opertaions that yield the same result twice, this operation will not be included in the solution, just like if it threw an error.
