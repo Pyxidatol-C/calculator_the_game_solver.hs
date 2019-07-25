@@ -12,6 +12,7 @@ A haskell solver for [*Calculator The Game*](https://apps.apple.com/us/app/calcu
     - [Parameters](#parameters)
     - [`Op`erations](#operations)
     - [Notes](#notes)
+  - [Brief Explanation](#brief-explanation)
 
 ## Gallery
 
@@ -179,3 +180,15 @@ main =
 - `[+] 1` interacts with `Add`, `Sub`, `Mul`, `Div`, `Ins`(, `StoreInsert` and `Replace`).
 
 - `Insert` and `Replace` only take string representations of non-negative integers as argument(s).
+
+## Brief Explanation
+
+How does the code find a solution?
+
+Well, using brute force:
+we attempt to apply each operation for each of the current values.
+That is, unless doing so gives us back a value that we have already encountered, in which case we will stop to avoid turning in circles.
+We then repeat this step with the freshly generated values, until we find the solution or the maximum number of steps allowed is reached.
+In the latter situation, an exception will be thrown.
+
+Further optimisations are possible, of course, but somewhat unnecessary, as the current program is capable of finding the solutions to the problems in the original game in a split second.
